@@ -1,0 +1,220 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+ 
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+ 
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+ 
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+ 
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+ 
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+ 
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+ 
+    --radius: 0.5rem;
+  }
+}
+ 
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom CRM styles */
+.crm-header {
+  @apply sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60;
+}
+
+.crm-nav-link {
+  @apply flex items-center gap-2 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary hover:bg-accent;
+}
+
+.crm-nav-link.active {
+  @apply text-primary bg-accent;
+}
+
+.crm-card {
+  @apply rounded-lg border bg-card p-6 text-card-foreground shadow-sm hover:shadow-md transition-shadow;
+}
+
+.crm-stat-card {
+  @apply crm-card flex flex-col items-center justify-center text-center p-4;
+}
+
+.crm-status-badge {
+  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium;
+}
+
+.crm-priority-badge {
+  @apply inline-flex items-center rounded-full px-2 py-1 text-xs font-medium;
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slideIn 0.4s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Loading spinner */
+.loading-spinner {
+  @apply animate-spin rounded-full border-2 border-gray-300 border-t-primary;
+}
+
+/* Responsive utilities */
+.crm-container {
+  @apply mx-auto max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.crm-grid {
+  @apply grid gap-4 md:gap-6;
+}
+
+.crm-grid-2 {
+  @apply crm-grid grid-cols-1 md:grid-cols-2;
+}
+
+.crm-grid-3 {
+  @apply crm-grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3;
+}
+
+.crm-grid-4 {
+  @apply crm-grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4;
+}
+
+/* Form styles */
+.crm-form-group {
+  @apply space-y-2;
+}
+
+.crm-form-label {
+  @apply block text-sm font-medium text-foreground;
+}
+
+.crm-form-input {
+  @apply w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+}
+
+/* Table styles */
+.crm-table {
+  @apply w-full border-collapse rounded-md border border-border;
+}
+
+.crm-table-header {
+  @apply bg-muted/50;
+}
+
+.crm-table-row {
+  @apply border-b transition-colors hover:bg-muted/50;
+}
+
+.crm-table-cell {
+  @apply p-4 align-middle text-sm;
+}
+
+.crm-table-head {
+  @apply p-4 text-left text-sm font-medium text-muted-foreground;
+}
+
+/* Sidebar styles */
+.crm-sidebar {
+  @apply hidden border-r bg-background lg:block lg:w-64 lg:flex-shrink-0;
+}
+
+.crm-mobile-menu {
+  @apply fixed inset-0 z-50 bg-background lg:hidden;
+}
+
+/* Dashboard specific styles */
+.crm-dashboard-header {
+  @apply mb-8 flex items-center justify-between;
+}
+
+.crm-dashboard-title {
+  @apply text-3xl font-bold tracking-tight;
+}
+
+.crm-dashboard-stats {
+  @apply crm-grid-4 mb-8;
+}
+
+/* Dark mode support */
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+ 
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+ 
+  --primary: 217.2 91.2% 59.8%;
+  --primary-foreground: 222.2 84% 4.9%;
+ 
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+ 
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+ 
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+ 
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 224.3 76.3% 94.1%;
+}

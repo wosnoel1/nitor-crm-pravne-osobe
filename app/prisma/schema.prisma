@@ -1,0 +1,189 @@
+// NITOR CRM Database Schema - Faza 1
+// PostgreSQL database with RLS policies for agent/manager/admin roles
+
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/nitor_crm/app/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+// ===============================================
+// CORE ENTITIES
+// ===============================================
+
+model Agent {
+  id            String   @id @default(cuid())
+  agentCode     String   @unique @map("agent_code") // AG001, MG001, AD001
+  firstName     String   @map("first_name")
+  lastName      String   @map("last_name")
+  email         String   @unique
+  role          Role     @default(AGENT)
+  isActive      Boolean  @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  
+  // Relations
+  leads            Lead[]
+  documents        Document[]
+  processActivities ProcessActivity[]
+  auditLogs        AuditLog[]
+
+  @@map("agents")
+}
+
+model Lead {
+  id            String    @id @default(cuid())
+  firstName     String    @map("first_name")
+  lastName      String    @map("last_name")
+  email         String?
+  phone         String?
+  company       String?
+  position      String?
+  sourceId      String    @map("source_id")
+  statusId      String    @map("status_id")
+  priority      Priority  @default(MEDIUM)
+  value         Decimal?  @db.Decimal(10, 2)
+  notes         String?   @db.Text
+  agentId       String    @map("agent_id")
+  convertedAt   DateTime? @map("converted_at") // Kada je lead konvertiran u klijenta
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+  
+  // Relations
+  agent             Agent @relation(fields: [agentId], references: [id])
+  source            LeadSource @relation(fields: [sourceId], references: [id])
+  status            LeadStatus @relation(fields: [statusId], references: [id])
+  documents         Document[]
+  processActivities ProcessActivity[]
+
+  @@map("leads")
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  fileName    String   @map("file_name")
+  fileSize    Int      @map("file_size")
+  fileType    String   @map("file_type")
+  filePath    String   @map("file_path") // Path u storage-u
+  title       String?
+  description String?
+  leadId      String?  @map("lead_id")
+  agentId     String   @map("agent_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  lead  Lead? @relation(fields: [leadId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@map("documents")
+}
+
+model ProcessActivity {
+  id          String       @id @default(cuid())
+  type        ActivityType
+  title       String
+  description String?      @db.Text
+  leadId      String?      @map("lead_id")
+  agentId     String       @map("agent_id")
+  scheduledAt DateTime?    @map("scheduled_at") // Za follow-up aktivnosti
+  completedAt DateTime?    @map("completed_at")
+  createdAt   DateTime     @default(now()) @map("created_at")
+  
+  // Relations
+  lead  Lead? @relation(fields: [leadId], references: [id])
+  agent Agent @relation(fields: [agentId], references: [id])
+
+  @@map("process_activities")
+}
+
+model AuditLog {
+  id          String    @id @default(cuid())
+  tableName   String    @map("table_name")
+  recordId    String    @map("record_id")
+  action      AuditAction
+  oldValues   Json?     @map("old_values")
+  newValues   Json?     @map("new_values")
+  agentId     String?   @map("agent_id")
+  ipAddress   String?   @map("ip_address")
+  userAgent   String?   @map("user_agent")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  
+  // Relations
+  agent Agent? @relation(fields: [agentId], references: [id])
+
+  @@map("audit_log")
+}
+
+// ===============================================
+// LOOKUP TABLES
+// ===============================================
+
+model LeadSource {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String?  // Hex color za UI
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  leads Lead[]
+
+  @@map("lead_sources")
+}
+
+model LeadStatus {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  color     String?  // Hex color za UI
+  order     Int      @default(0) // Za sortiranje u UI
+  isActive  Boolean  @default(true) @map("is_active")
+  isFinal   Boolean  @default(false) @map("is_final") // Da li je konačni status
+  createdAt DateTime @default(now()) @map("created_at")
+  
+  // Relations
+  leads Lead[]
+
+  @@map("lead_statuses")
+}
+
+// ===============================================
+// ENUMS
+// ===============================================
+
+enum Role {
+  AGENT
+  MANAGER
+  ADMIN
+}
+
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ActivityType {
+  CALL
+  EMAIL
+  MEETING
+  FOLLOW_UP
+  DOCUMENT_UPLOAD
+  STATUS_CHANGE
+  NOTE
+  SYSTEM
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+}
